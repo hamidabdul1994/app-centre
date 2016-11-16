@@ -1,18 +1,25 @@
 /**
  * define require module
  */
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+    autoIncrement = require('mongoose-auto-increment');
+    mongoose.Promise = global.Promise;
+
+var url = 'mongodb://localhost:27017/appCentre';
+var connection = mongoose.connect(url);
+autoIncrement.initialize(connection);
+
 
 /**
  * Define category Schema
  * also define the model and export
  */
 var category = mongoose.Schema({
-      cat_id: {
+      package_id: {
         type: Number,
         required: true
     },
-    cat_name: {
+    package_name: {
         type: String,
         required: true
     },
@@ -31,12 +38,13 @@ var category = mongoose.Schema({
     }
 });
 
-var category = mongoose.model('category', category, 'category');
+category.plugin(autoIncrement.plugin,{ model: 'category', field: 'package_id' });
+var category = mongoose.model('category', category);
 /**
  * @exports {feedback}
- */
+ **/
 exports.category = category;
-//
+
 // var angularUser = mongoose.Schema({
 //     name: {
 //         type: String

@@ -7,21 +7,15 @@ Purpose:To handle several state for front end, and send the data as a response
 
 var express = require('express'),
     router = express.Router(),
-    client = require('redis').createClient(),
-    redisData = require("../common/saveRedisData.js");
+    HashTable = require("../common/hashtable.js"),
+    commonMethod = require("../common/commonMethod.js");
 
-client.on('connect', function() {
-    console.log('Redis Server connected');
-});
+if(HashTable.length===0){
+    commonMethod.readCategoryJSON(function(data){
+      HashTable.setItemObject(JSON.parse(data));
+    })
+  }
 
-client.exists('catPackage', function(err, reply) {
-    if (reply === 1) {
-        console.log('exists');
-    } else {
-      console.log("Enter the data in redis");
-        redisData.saveJSONInRedis();
-    }
-});
 
 /*** /getAppDetails state is use to give app details to Front End page ***/
 router.use('/getAppDetails', require('./getAppDetails.js'));
