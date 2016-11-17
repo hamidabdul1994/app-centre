@@ -18,9 +18,9 @@ if(HashTable.length===0){
 
 
 /*** /getAppDetails state is use to give app details to Front End page ***/
-router.use('/getAppDetails', require('./getAppDetails.js'));
+router.use('/categoryForPackage', require('./categoryForPackage.js'));
 
 /*** /getCatagoryType state is use to give app store data to frint End page ***/
-router.use('/getCatagoryType', require('./getCatagoryType.js'));
+router.use('/categoryList', require('./categoryList.js'));
 
 module.exports = router;

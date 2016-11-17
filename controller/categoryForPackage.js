@@ -1,13 +1,12 @@
-var bodyParser = require('body-parser');
+// var bodyParser = require('body-parser');
 var express = require('express');
 var router = express.Router();
 var commonMethod = require("../common/commonMethod");
 var redisClient = require('redis').createClient();
-var conn = require("../database/schema");
 
-
+/** For Testing i am Generating get Method***/
 router.get('/:url', function(req, res) {
-    console.log("getAppDetails called");
+    console.log("categoryForPackage called");
     var package_name = req.params.url;
     var hashKey = commonMethod.generateHashCode(package_name);    /*** Generating HashKey***/
     var url = "https://play.google.com/store/apps/details?id=" + package_name;

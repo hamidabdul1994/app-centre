@@ -8,7 +8,7 @@ var commonMethod = {};
 /****** Method to generate Hash Code for storing the Package_id in hashSet ******/
 commonMethod.generateHashCode = function(url) {
     var hash = 5387;
-    var char, hash;
+    var char;
     for (i = 0; i < url.length; i++) {
         char = url.charCodeAt(i);
         hash = ((hash << 5) + hash) + char; /* (hash will left shift by 5 AND add with actual hash) + char  */
@@ -20,7 +20,7 @@ commonMethod.generateHashCode = function(url) {
 };
 
 /******* Method to save Data in MongoDB using schema ************/
-commonMethod.saveInMongo = function(objData,callback) {
+commonMethod.saveInMongo = function(objData, callback) {
     var data = new conn.category({
         package_name: objData.title,
         GPcategory: objData.GPcategory,
@@ -32,9 +32,13 @@ commonMethod.saveInMongo = function(objData,callback) {
      **/
     data.save(function(error, result) {
         if (error) {
-            callback({"error":error})
+            callback({
+                "error": error
+            })
         } else {
-            callback({"data":result});
+            callback({
+                "data": result
+            });
         }
     });
 };
@@ -50,11 +54,11 @@ commonMethod.scrapePackage = function(url, callback) {
                 objData.title = $(".id-app-title").text();
                 objData.GPcategory = $('.category').children().first().text();
 
-                    objData.category = HashTable.getItem(objData.GPcategory);
-                    // commonMethod.saveInMongo(objData);
-                    callback({
-                        "data": objData
-                    });
+                objData.category = HashTable.getItem(objData.GPcategory);
+                // commonMethod.saveInMongo(objData);
+                callback({
+                    "data": objData
+                });
             } else {
                 callback({
                     "error": "Package Name is incorrect!!!"
