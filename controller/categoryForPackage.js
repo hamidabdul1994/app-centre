@@ -7,27 +7,31 @@ var redisClient = require('redis').createClient();
 /** For Testing i am Generating get Method***/
 router.get('/:url', function(req, res) {
     console.log("categoryForPackage called");
-    var package_name = req.params.url;
-    var hashKey = commonMethod.generateHashCode(package_name);    /*** Generating HashKey***/
-    var url = "https://play.google.com/store/apps/details?id=" + package_name;
+    var packageName = req.params.url;
+    var hashKey = commonMethod.generateHashCode(packageName);    /*** Generating HashKey***/
+    var url = "https://play.google.com/store/apps/details?id=" + packageName;
     var idStore = hashKey + "id"; //For Retriving package id
-    var catStore = hashKey + "cat";
+    var userLang = "en";//navigator.language || navigator.userLanguage;
+    userLang = (userLang.search("en") !== -1 ? "en" : userLang); //Checking locale
     console.log("id:", idStore);
 
     /****** Check HashMap Package Data is available or not******/
     redisClient.hgetall(idStore, function(error, hmData) {
+
+      /* WHen HashMap Having some value**/
+        if(hmData !== null)
+        var hmPackData=JSON.parse(hmData[packageName]);
+
         /*** When HashMap has nothing**/
-        if (hmData === null || hmData[package_name] == null) {
-            commonMethod.scrapePackage(url, function(data) {
+        if (hmData === null || hmPackData["Name"] === null || hmPackData["locale"] !== userLang) {
+            commonMethod.scrapePackage(url,userLang, function(data) {
                 if (!data.error) {
                     commonMethod.saveInMongo(data.data, function(mongoData) {
                         if (!mongoData.error) {
-                            var tempObjId = {},
-                                tempObjCat = {}; /*** Declaring Object ***/
-                            tempObjId[package_name] = mongoData.data.package_id; /***Package Name is Key and value is Package ID***/
-                            tempObjCat[package_name] = mongoData.data.category; /*** Package Name is Key and category is value **/
-                            redisClient.hmset(idStore, tempObjId);
-                            redisClient.hmset(catStore, tempObjCat);
+                            var tempObjId={};
+                            tempObjId[packageName] =JSON.stringify({"Name":packageName,"ID":mongoData.data.packageId,"locale":mongoData.data.locale,"category":mongoData.data.category,"catId":mongoData.data.catId});
+                            console.log(tempObjId);
+                             redisClient.hmset(idStore,tempObjId);
                             res.send(JSON.stringify(mongoData.data));
                         }
                     });
@@ -38,7 +42,7 @@ router.get('/:url', function(req, res) {
         } else {
             /**return redis cache**/
             console.log("having value");
-            res.send(JSON.stringify(hmData[package_name]));
+            res.send(JSON.stringify(hmData[packageName]));
 
         }
     });

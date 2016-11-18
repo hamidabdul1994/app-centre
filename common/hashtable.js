@@ -1,4 +1,4 @@
-
+/**HashTable Class***/
 function HashTable(obj)
 {
     this.length = 0;
@@ -83,4 +83,5 @@ function HashTable(obj)
         this.length = 0;
     }
 }
+
 module.exports=new HashTable();

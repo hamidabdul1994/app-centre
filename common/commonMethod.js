@@ -1,6 +1,6 @@
 var conn = require("../database/schema");
 var fs = require('fs');
-var HashTable = require("../common/hashtable");
+var HashTable1 = require("./hashtable");
 var request = require("request");
 var cheerio = require("cheerio");
 var commonMethod = {};
@@ -22,7 +22,8 @@ commonMethod.generateHashCode = function(url) {
 /******* Method to save Data in MongoDB using schema ************/
 commonMethod.saveInMongo = function(objData, callback) {
     var data = new conn.category({
-        package_name: objData.title,
+        packageName: objData.title,
+        locale:objData.locale,
         GPcategory: objData.GPcategory,
         category: objData.category
     });
@@ -31,6 +32,7 @@ commonMethod.saveInMongo = function(objData, callback) {
      * @return {successfully uploaded}
      **/
     data.save(function(error, result) {
+        result['catId']=objData.catId;
         if (error) {
             callback({
                 "error": error
@@ -44,7 +46,7 @@ commonMethod.saveInMongo = function(objData, callback) {
 };
 
 /******* Method is use to Scrape the package data and callback to caller   ******/
-commonMethod.scrapePackage = function(url, callback) {
+commonMethod.scrapePackage = function(url,locale, callback) {
     request(url, function(error, response, html) {
         if (!error) {
             var $ = cheerio.load(html);
@@ -53,8 +55,9 @@ commonMethod.scrapePackage = function(url, callback) {
                 var objData = {};
                 objData.title = $(".id-app-title").text();
                 objData.GPcategory = $('.category').children().first().text();
-
-                objData.category = HashTable.getItem(objData.GPcategory);
+                objData.locale=locale;
+                objData.category = HashTable1.getItem(objData.GPcategory).CatName;
+                objData.catId = HashTable1.getItem(objData.GPcategory).CatId;
                 // commonMethod.saveInMongo(objData);
                 callback({
                     "data": objData
