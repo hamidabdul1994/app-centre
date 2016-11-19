@@ -10,17 +10,22 @@ var express = require('express'),
     HashTable = require("../common/hashtable.js"),
     commonMethod = require("../common/commonMethod.js");
 
-if(HashTable.length===0){
-    commonMethod.readCategoryJSON(function(data){
-      HashTable.setItemObject(JSON.parse(data));
+if (HashTable.length === 0) {
+    commonMethod.readCategoryJSON('./category.json',function(data) {
+        HashTable.setItemObject(JSON.parse(data));
     })
-  }
+}
 
 
-/*** /getAppDetails state is use to give app details to Front End page ***/
+/*** /categoryForPackage state is use to give app details to Front End page ***/
 router.use('/categoryForPackage', require('./categoryForPackage.js'));
 
-/*** /getCatagoryType state is use to give app store data to frint End page ***/
+/*** /categoryList state is use to give app store data to frint End page ***/
 router.use('/categoryList', require('./categoryList.js'));
 
+/** /updateTopPackagesList**/
+router.use("/updateTopPackagesList", require("./updateTopPackagesList.js"));
+
+/** /syncTopPackagesCategories**/
+router.use("/syncTopPackagesCategories", require("./syncTopPackagesCategories.js"));
 module.exports = router;

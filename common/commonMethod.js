@@ -73,8 +73,8 @@ commonMethod.scrapePackage = function(url,locale, callback) {
 };
 
 /****** Method to read package category JSON data********/
-commonMethod.readCategoryJSON = function(callback) {
-    fs.readFile('./category.json', 'utf8', function(err, data) {
+commonMethod.readCategoryJSON = function(fileName,callback) {
+    fs.readFile(fileName, 'utf8', function(err, data) {
         if (err) throw err;
         callback(data);
     });

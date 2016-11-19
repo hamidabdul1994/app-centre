@@ -3,7 +3,7 @@
  */
 var mongoose = require('mongoose'),
     autoIncrement = require('mongoose-auto-increment');
-    mongoose.Promise = global.Promise;
+mongoose.Promise = global.Promise;
 
 var url = 'mongodb://localhost:27017/appCentre';
 var connection = mongoose.connect(url);
@@ -15,10 +15,10 @@ autoIncrement.initialize(connection);
  * also define the model and export
  */
 var category = mongoose.Schema({
-      packageId: {
+    packageId: {
         type: Number,
         required: true,
-        default:1
+        default: 1
     },
     packageName: {
         type: String,
@@ -28,9 +28,9 @@ var category = mongoose.Schema({
         type: String,
         required: true
     },
-    locale:{
-      type: String,
-      required: true
+    locale: {
+        type: String,
+        required: true
     },
     GPcategory: {
         type: String,
@@ -43,7 +43,10 @@ var category = mongoose.Schema({
     }
 });
 
-category.plugin(autoIncrement.plugin,{ model: 'category', field: 'packageId' });
+category.plugin(autoIncrement.plugin, {
+    model: 'category',
+    field: 'packageId'
+});
 var category = mongoose.model('category', category);
 /**
  * @exports {feedback}
