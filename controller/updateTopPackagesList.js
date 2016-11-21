@@ -16,26 +16,19 @@ router.get('/', function(req, res) {
     // for(a=0;a<data.packages.length;a++){
     //
     // }
-    iterate(data.packages).then(updatePackage).then(function(data){
-    // console.log("loag",data);
-  });
+    data.packages.forEach(function(arry){
+      updatePackage(arry).then(function(data){
+        console.log("log",data);
+      });
+    })
 
     console.log("updateTopPackagesList called");
     res.send("success categoryList");
 });
 module.exports = router;
 
-function iterate(data){
-  return new Promise(function(resolve, reject){
-  data.forEach(function(arry){
-  resolve(arry);
-  });
-});
-}
-
 function updatePackage(packageName)
 {
-  console.log(packageName);
   /** Handle Asyn call **/
   return new Promise(function(resolve, reject){
   var hashKey = commonMethod.generateHashCode(packageName); /*** Generating HashKey***/
@@ -75,7 +68,7 @@ function updatePackage(packageName)
               } else {
                   reject(data.error);
               }
-          });arry
+          });
       } else {
           /**return redis cache**/
           console.log("having value");
