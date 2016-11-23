@@ -7,25 +7,35 @@ router.get('/', function(req, res) {
     var data = {};
     data.packages = [
         "com.softwego.lockscreen",
-        "us.screen.recorder"
+        "us.screen.recorder",
         // "com.hp.hp12c",
-        // "com.NatAguilar.settechnician",
+        "com.NatAguilar.settechnician"
         // "net.ddroid.sw2.wface.model",
         // "com.bykup"
     ];
-    // for(a=0;a<data.packages.length;a++){
-    //
-    // }
-    data.packages.forEach(function(arry){
-      updatePackage(arry).then(function(data){
-        console.log("log",data);
-      });
-    })
-
+    Promise.all(data.packages.map(fn))
+    .then(function(data){
+      console.log("Woking Done...",data);
+      res.send(JSON.stringify({status:"200",message:"Package update is successful"}));
+    }).catch(function(err){
+      console.log("error..:",err);
+      res.send(JSON.stringify(err));
+    });
     console.log("updateTopPackagesList called");
-    res.send("success categoryList");
+
 });
 module.exports = router;
+
+var fn = function iterate(packageData){
+  return new Promise(function(resolve, reject){
+  updatePackage(packageData)
+  .then(function(data){
+  resolve(data);
+  }).catch(function(err){
+  reject(err);
+})
+});
+}
 
 function updatePackage(packageName)
 {
