@@ -15,7 +15,7 @@ router.get('/', function(req, res) {
     ];
     Promise.all(data.packages.map(fn))
     .then(function(data){
-      console.log("Woking Done...",data);
+      console.log("Woking Done...");
       res.send(JSON.stringify({status:"200",message:"Package update is successful"}));
     }).catch(function(err){
       console.log("error..:",err);
@@ -57,34 +57,46 @@ function updatePackage(packageName)
 
       /*** When HashMap has nothing**/
       if (hmData === null || hmPackData["Name"] === null || hmPackData["locale"] !== userLang) {
-          commonMethod.scrapePackage(url, userLang, function(data) {
-              if (!data.error) {
-                  commonMethod.saveInMongo(data.data, function(mongoData) {
-                      if (!mongoData.error) {
-                          var tempObjId = {};
-                          tempObjId[packageName] = JSON.stringify({
-                              "Name": packageName,
-                              "ID": mongoData.data.packageId,
-                              "locale": mongoData.data.locale,
-                              "category": mongoData.data.category,
-                              "catId": mongoData.data.catId
-                          });
-                          console.log(tempObjId);
-                          redisClient.hmset(idStore, tempObjId);
-                           resolve(mongoData.data)
-                          // res.send(JSON.stringify(mongoData.data));
-                      }
-                  });
-              } else {
-                  reject(data.error);
-              }
-          });
+            commonMethod.scrapePackage(url, userLang).then(commonMethod.saveInMongo).then(function(mongoData) {
+                var tempObjId = {};
+                tempObjId[packageName] = JSON.stringify({
+                    "Name": packageName,
+                    "ID": mongoData.data.packageId,
+                    "locale": mongoData.data.locale,
+                    "category": mongoData.data.category,
+                    "catId": mongoData.data.catId
+                });
+                redisClient.hmset(idStore, tempObjId);
+                resolve(mongoData.data);
+            }).catch(function(data) {
+                reject(data.error);
+            });
+
+          // commonMethod.scrapePackage(url, userLang, function(data) {
+          //     if (!data.error) {
+          //         commonMethod.saveInMongo(data.data, function(mongoData) {
+          //             if (!mongoData.error) {
+          //                 var tempObjId = {};
+          //                 tempObjId[packageName] = JSON.stringify({
+          //                     "Name": packageName,
+          //                     "ID": mongoData.data.packageId,
+          //                     "locale": mongoData.data.locale,
+          //                     "category": mongoData.data.category,
+          //                     "catId": mongoData.data.catId
+          //                 });
+          //                 console.log(tempObjId);
+          //                 redisClient.hmset(idStore, tempObjId);
+          //                  resolve(mongoData.data)
+          //                 // res.send(JSON.stringify(mongoData.data));
+          //             }
+          //         });
+          //     } else {
+          //         reject(data.error);
+          //     }
+          // });
       } else {
           /**return redis cache**/
-          console.log("having value");
            resolve(hmData[packageName]);
-          // res.send(JSON.stringify(hmData[packageName]));
-
       }
   });
 });

@@ -24,27 +24,22 @@ router.get('/:url', function(req, res) {
 
         /*** When HashMap has nothing**/
         if (hmData === null || hmPackData["Name"] === null || hmPackData["locale"] !== userLang) {
-            commonMethod.scrapePackage(url, userLang, function(data) {
-                if (!data.error) {
-                    commonMethod.saveInMongo(data.data, function(mongoData) {
-                        if (!mongoData.error) {
-                            var tempObjId = {};
-                            tempObjId[packageName] = JSON.stringify({
-                                "Name": packageName,
-                                "ID": mongoData.data.packageId,
-                                "locale": mongoData.data.locale,
-                                "category": mongoData.data.category,
-                                "catId": mongoData.data.catId
-                            });
-                            console.log(tempObjId);
-                            redisClient.hmset(idStore, tempObjId);
-                            res.send(JSON.stringify(mongoData.data));
-                        }
-                    });
-                } else {
-                    res.send(data.error);
-                }
-            });
+            commonMethod.scrapePackage(url, userLang).then(commonMethod.saveInMongo).then(function(mongoData) {
+                var tempObjId = {};
+                tempObjId[packageName] = JSON.stringify({
+                    "Name": packageName,
+                    "ID": mongoData.data.packageId,
+                    "locale": mongoData.data.locale,
+                    "category": mongoData.data.category,
+                    "catId": mongoData.data.catId
+                });
+                console.log(tempObjId);
+                redisClient.hmset(idStore, tempObjId);
+                res.send(JSON.stringify(mongoData.data));
+            }).catch(function(data) {
+                res.send(data.error);
+            })
+
         } else {
             /**return redis cache**/
             console.log("having value");

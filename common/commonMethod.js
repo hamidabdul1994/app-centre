@@ -20,13 +20,15 @@ commonMethod.generateHashCode = function(url) {
 };
 
 /******* Method to save Data in MongoDB using schema ************/
-commonMethod.saveInMongo = function(objData, callback) {
-    var data = new conn.category({
-        packageName: objData.title,
-        locale:objData.locale,
-        GPcategory: objData.GPcategory,
-        category: objData.category
-    });
+commonMethod.saveInMongo = function(objData) {
+  var data = new conn.category({
+      packageName: objData.title,
+      locale:objData.locale,
+      GPcategory: objData.GPcategory,
+      category: objData.category
+  });
+
+  return new Promise(function(resolve, reject){
     /**
      * save data in database
      * @return {successfully uploaded}
@@ -34,19 +36,23 @@ commonMethod.saveInMongo = function(objData, callback) {
     data.save(function(error, result) {
         result['catId']=objData.catId;
         if (error) {
-            callback({
+            reject({
                 "error": error
             })
         } else {
-            callback({
+            resolve({
                 "data": result
             });
         }
     });
+
+  })
+
 };
 
 /******* Method is use to Scrape the package data and callback to caller   ******/
-commonMethod.scrapePackage = function(url,locale, callback) {
+commonMethod.scrapePackage = function(url,locale) {
+  return new Promise(function(resolve, reject){
     request(url, function(error, response, html) {
         if (!error) {
             var $ = cheerio.load(html);
@@ -56,20 +62,18 @@ commonMethod.scrapePackage = function(url,locale, callback) {
                 objData.title = $(".id-app-title").text();
                 objData.GPcategory = $('.category').children().first().text();
                 objData.locale=locale;
-                objData.category = HashTable1.getItem(objData.GPcategory).CatName;
+                objData.category = HashTable1.getItem(objData.GPcategory).CatName;  /*JSON have different format*/
                 objData.catId = HashTable1.getItem(objData.GPcategory).CatId;
-                // commonMethod.saveInMongo(objData);
-                callback({
-                    "data": objData
-                });
+                resolve(objData);
             } else {
-                callback({
+                reject({
                     "error": "Package Name is incorrect!!!"
                 });
             }
-
         }
     });
+  })
+
 };
 
 /****** Method to read package category JSON data********/
