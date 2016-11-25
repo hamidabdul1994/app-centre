@@ -16,9 +16,13 @@ if (HashTable.length === 0) {
     })
 }
 
-
+router.get("/",function(req, res){
+  console.log("/ get wokring");
+  res.send({"ok":"200"});
+});
 /*** /categoryForPackage state is use to give app details to Front End page ***/
 router.use('/categoryForPackage', require('./categoryForPackage.js'));
+
 
 /*** /categoryList state is use to give app store data to frint End page ***/
 router.use('/categoryList', require('./categoryList.js'));
