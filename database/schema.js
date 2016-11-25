@@ -45,7 +45,8 @@ var category = mongoose.Schema({
 
 category.plugin(autoIncrement.plugin, {
     model: 'category',
-    field: 'packageId'
+    field: 'packageId',
+    startAt: 1
 });
 var category = mongoose.model('category', category);
 /**

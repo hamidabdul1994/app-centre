@@ -21,63 +21,81 @@ commonMethod.generateHashCode = function(url) {
 
 /******* Method to save Data in MongoDB using schema ************/
 commonMethod.saveInMongo = function(objData) {
-  var data = new conn.category({
-      packageName: objData.title,
-      locale:objData.locale,
-      GPcategory: objData.GPcategory,
-      category: objData.category
-  });
-
-  return new Promise(function(resolve, reject){
-    /**
-     * save data in database
-     * @return {successfully uploaded}
-     **/
-    data.save(function(error, result) {
-        result['catId']=objData.catId;
-        if (error) {
-            reject({
-                "error": error
-            })
-        } else {
-            resolve({
-                "data": result
-            });
-        }
+    var data = new conn.category({
+        packageName: objData.title,
+        locale: objData.locale,
+        GPcategory: objData.GPcategory,
+        category: objData.category
     });
 
-  })
+    return new Promise(function(resolve, reject) {
+        /**
+         * save data in database
+         * @return {successfully uploaded}
+         **/
+        data.save(function(error, result) {
+            result['catId'] = objData.catId;
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        });
+
+    })
 
 };
 
-/******* Method is use to Scrape the package data and callback to caller   ******/
-commonMethod.scrapePackage = function(url,locale) {
-  return new Promise(function(resolve, reject){
-    request(url, function(error, response, html) {
-        if (!error) {
-            var $ = cheerio.load(html);
-            /***** Code is checking whether Package Name is correct or not *****/
-            if ($("#error-section").length === 0) {
-                var objData = {};
-                objData.title = $(".id-app-title").text();
-                objData.GPcategory = $('.category').children().first().text();
-                objData.locale=locale;
-                objData.category = HashTable1.getItem(objData.GPcategory).CatName;  /*JSON have different format*/
-                objData.catId = HashTable1.getItem(objData.GPcategory).CatId;
-                resolve(objData);
-            } else {
-                reject({
-                    "error": "Package Name is incorrect!!!"
-                });
+commonMethod.updateMongo = function(objData, p_id) {
+console.log(p_id);
+    return new Promise(function(resolve, reject) {
+        conn.category.update({
+            "packageId": p_id
+        }, {$set:{
+            "GPcategory": objData.GPcategory,
+            "category": objData.category,
+            "timestamp": Date.now()
+        }}, function(err, data) {
+
+            if (err) {
+                reject(err)
+            }else {
+            resolve(data);
             }
-        }
+
+        });
+
     });
-  })
+};
+
+/******* Method is use to Scrape the package data and callback to caller   ******/
+commonMethod.scrapePackage = function(url, locale) {
+    return new Promise(function(resolve, reject) {
+        request(url, function(error, response, html) {
+            if (!error) {
+                var $ = cheerio.load(html);
+                /***** Code is checking whether Package Name is correct or not *****/
+                if ($("#error-section").length === 0) {
+                    var objData = {};
+                    objData.title = $(".id-app-title").text();
+                    objData.GPcategory = $('.category').children().first().text();
+                    objData.locale = locale;
+                    objData.category = HashTable1.getItem(objData.GPcategory).CatName; /*JSON have different format*/
+                    objData.catId = HashTable1.getItem(objData.GPcategory).CatId;
+                    resolve(objData);
+                } else {
+                    reject({
+                        "error": "Package Name is incorrect!!!"
+                    });
+                }
+            }
+        });
+    })
 
 };
 
 /****** Method to read package category JSON data********/
-commonMethod.readCategoryJSON = function(fileName,callback) {
+commonMethod.readCategoryJSON = function(fileName, callback) {
     fs.readFile(fileName, 'utf8', function(err, data) {
         if (err) throw err;
         callback(data);

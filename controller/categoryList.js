@@ -5,7 +5,7 @@ var commonMethod = require("../common/commonMethod.js");
 
 
 /**POST (request locale)**/
-router.get('/', function(req, res) {
+router.post('/', function(req, res) {
   console.log("/categoryList called");
 
   commonMethod.readCategoryJSON("./categoryLocale.json",function(data){
