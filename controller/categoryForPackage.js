@@ -34,7 +34,7 @@ router.post('/', function(req, res) {
                   "catId": objData.catId
               });
                redisClient.hmset(idStore, data);
-              res.send({package_name:packageName,locale_code:objData.locale});
+              res.send({package_name:packageName,category:objData.catId,category_name:objData.category});
             }).catch(function(data) {
                 res.send(data.error);
             });
@@ -43,7 +43,7 @@ router.post('/', function(req, res) {
             /**return redis cache**/
             console.log("having value");
             var data = JSON.parse(hmData[packageName])
-            res.send({package_name:data.packageName,locale_code:data.locale});
+            res.send({package_name:packageName,category:objData.catId,category_name:objData.category});
 
         }
     });
