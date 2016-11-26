@@ -43,7 +43,7 @@ router.post('/', function(req, res) {
             /**return redis cache**/
             console.log("having value");
             var data = JSON.parse(hmData[packageName])
-            res.send({package_name:packageName,category:objData.catId,category_name:objData.category});
+            res.send({package_name:packageName,category:data.catId,category_name:data.category});
 
         }
     });
