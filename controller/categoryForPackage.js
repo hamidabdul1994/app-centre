@@ -7,6 +7,7 @@ var redisClient = require('redis').createClient(14344, 'redis-14344.c10.us-east-
 /** POST Method***/
 router.post('/', function(req, res) {
     console.log("categoryForPackage called");
+    try{
     var reqData = req.body;
     var packageName = reqData.packageName;
     var hashKey = commonMethod.generateHashCode(packageName); /*** Generating HashKey***/
@@ -47,6 +48,9 @@ router.post('/', function(req, res) {
 
         }
     });
+  }catch(e){
+    res.status(400).send("Bad Header body");
+  }
 
 
 });

@@ -4,7 +4,7 @@ var commonMethod = require("../common/commonMethod");
 var redisClient = require('redis').createClient(14344, 'redis-14344.c10.us-east-1-4.ec2.cloud.redislabs.com', {no_ready_check: true});
 /**POST (request)**/
 router.post('/', function(req, res) {
-    console.log();
+  try{
     var packages = JSON.parse(req.body.packageData);
     Promise.all(packages.map(fn))
         .then(function(data) {
@@ -18,6 +18,11 @@ router.post('/', function(req, res) {
             res.send(JSON.stringify("err"));
         });
     console.log("updateTopPackagesList called");
+
+  }catch(e){
+    res.status(400).send("Bad Header body");
+  }
+
 
 });
 module.exports = router;

@@ -54,6 +54,7 @@ console.log(p_id);
         }, {$set:{
             "GPcategory": objData.GPcategory,
             "category": objData.category,
+            "packageStatus":"packages_modified",
             "timestamp": Date.now()
         }}, function(err, data) {
 

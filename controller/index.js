@@ -2,7 +2,7 @@
 File Name:index.js
 Created By:Hamid Raza Noori
 date:07/11/2016
-Purpose:To handle several state for front end, and send the data as a response
+Purpose:To handle several state for front end request, and send the data as a response
 ****/
 
 var express = require('express'),
@@ -13,13 +13,9 @@ var express = require('express'),
 if (HashTable.length === 0) {
     commonMethod.readCategoryJSON('./category.json',function(data) {
         HashTable.setItemObject(JSON.parse(data));
-    })
+    });
 }
 
-router.get("/",function(req, res){
-  console.log("/ get wokring");
-  res.send({"ok":"200"});
-});
 /*** /categoryForPackage state is use to give app details to Front End page ***/
 router.use('/categoryForPackage', require('./categoryForPackage.js'));
 

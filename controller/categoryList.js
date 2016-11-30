@@ -6,12 +6,13 @@ var commonMethod = require("../common/commonMethod.js");
 
 /**POST (request locale)**/
 router.post('/', function(req, res) {
-  console.log("/categoryList called");
+    try {
+        commonMethod.readCategoryJSON("./categoryLocale.json", function(data) {
+            res.send(data);
+        });
+    } catch (e) {
+        res.status(400).send("Bad Header body");
+    }
 
-  commonMethod.readCategoryJSON("./categoryLocale.json",function(data){
-    // console.log(data);
-    res.send(data);
-  });
-    // res.send("success categoryList");
 });
 module.exports = router;
