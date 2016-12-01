@@ -21,9 +21,11 @@ commonMethod.generateHashCode = function(url) {
 
 /******* Method to save Data in MongoDB using schema ************/
 commonMethod.saveInMongo = function(objData) {
+  console.log("mongo Data::",objData);
     var data = new conn.category({
-        packageName: objData.title,
+        packageName: objData.packageName,
         locale: objData.locale,
+        categoryId:objData.catId,
         GPcategory: objData.GPcategory,
         category: objData.category
     });
@@ -34,6 +36,7 @@ commonMethod.saveInMongo = function(objData) {
          * @return {successfully uploaded}
          **/
         data.save(function(error, result) {
+          console.log("result::",result);
             result['catId'] = objData.catId;
             if (error) {
                 reject(error);
@@ -47,12 +50,12 @@ commonMethod.saveInMongo = function(objData) {
 };
 
 commonMethod.updateMongo = function(objData, p_id) {
-console.log(p_id);
     return new Promise(function(resolve, reject) {
         conn.category.update({
             "packageId": p_id
         }, {$set:{
             "GPcategory": objData.GPcategory,
+            "categoryId":objData.catId,
             "category": objData.category,
             "packageStatus":"package_modified",
             "timestamp": Date.now()
@@ -68,9 +71,53 @@ console.log(p_id);
 
     });
 };
+commonMethod.retrieveMongoData = function(timestamp){
+  return new Promise(function(resolve, reject) {
+        var tempObj ={};
+        tempObj.time_stamp=timestamp;
+        timestamp*=1000;
+        var call1 = findData(timestamp,"package_added").then(function(data){
+          tempObj[data.packageStatus]=data.data;
+        });
+
+        var call2 = findData(timestamp,"package_modified").then(function(data){
+          tempObj[data.packageStatus]=data.data;
+          resolve(tempObj);
+        }).catch(function(error){
+          reject(error);
+        })
+        Promise.all(findData).then(function(){
+          console.log("promise All:::",tempObj);
+        })
+      });
+
+}
+/***** Method to retrive the mongoData  ****/
+var findData = function(timeData,packageStatus){
+  return new Promise(function(resolve, reject) {
+    conn.category.find({"timestamp":{$gte:timeData},packageStatus},function(err,objData){
+      var temp =[];
+      if(objData){
+        if(objData.length>0)
+        {
+          objData.forEach(function(mongData,i){
+            temp.push({package_name:mongData.packageName,category_id:mongData.categoryId,category_name:mongData.category});
+          })
+
+      }else {
+        temp=[];
+      }
+        resolve({"data":temp,packageStatus});
+      }else {
+        reject(err);
+      }
+  });
+})
+}
 
 /******* Method is use to Scrape the package data and callback to caller   ******/
-commonMethod.scrapePackage = function(url, locale) {
+commonMethod.scrapePackage = function(url, locale,packageName) {
+  console.log(packageName);
     return new Promise(function(resolve, reject) {
         request(url, function(error, response, html) {
             if (!error) {
@@ -79,6 +126,7 @@ commonMethod.scrapePackage = function(url, locale) {
                 if ($("#error-section").length === 0) {
                     var objData = {};
                     objData.title = $(".id-app-title").text();
+                    objData.packageName=packageName;
                     objData.GPcategory = $('.category').children().first().text();
                     objData.locale = locale;
                     objData.category = HashTable1.getItem(objData.GPcategory).CatName; /*JSON have different format*/

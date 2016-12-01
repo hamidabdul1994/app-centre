@@ -25,7 +25,7 @@ router.post('/', function(req, res) {
 
         /*** When HashMap has nothing**/
         if (hmData === null || hmPackData["packageName"] === null || hmPackData["locale"] !== userLang) {
-            commonMethod.scrapePackage(url, userLang).then(commonMethod.saveInMongo).then(function(objData) {
+            commonMethod.scrapePackage(url, userLang,packageName).then(commonMethod.saveInMongo).then(function(objData) {
               var data={};
               data[packageName]=JSON.stringify({
                   "packageName": packageName,

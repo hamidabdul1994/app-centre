@@ -5,7 +5,8 @@ var redisClient = require('redis').createClient(14344, 'redis-14344.c10.us-east-
 /**POST (request)**/
 router.post('/', function(req, res) {
   try{
-    var packages = JSON.parse(req.body.packageData);
+    a = req.body.packageData.replace(/'/g, '"');  //to remove space it give error while converting string to array
+    var packages = JSON.parse(a);
     Promise.all(packages.map(fn))
         .then(function(data) {
             console.log("Woking Done...");
@@ -20,6 +21,7 @@ router.post('/', function(req, res) {
     console.log("updateTopPackagesList called");
 
   }catch(e){
+    console.log(e);
     res.status(400).send("Bad Header body");
   }
 
@@ -60,10 +62,9 @@ function updatePackage(packageName) {
 
             /*** When HashMap has nothing**/
             if (hmData === null || hmPackData["packageName"] === null || hmPackData["locale"] !== userLang) {
-              console.log("here",hmData);
-                commonMethod.scrapePackage(url, userLang).then(commonMethod.saveInMongo).then(function(mongoData) {
+                commonMethod.scrapePackage(url, userLang,packageName).then(commonMethod.saveInMongo).then(function(mongoData) {
+                  console.log(mongoData);
                     var tempObjId = {};
-                    console.log("packageName:",packageName);
                     tempObjId[packageName] = JSON.stringify({
                         "packageName": packageName,
                         "ID": mongoData.packageId,
@@ -71,7 +72,6 @@ function updatePackage(packageName) {
                         "category": mongoData.category,
                         "catId": mongoData.catId
                     });
-                    console.log(tempObjId);
                     redisClient.hmset(idStore, tempObjId);
                     resolve(mongoData.data);
                 }).catch(function(data) {
@@ -81,7 +81,7 @@ function updatePackage(packageName) {
             } else {
                 /**return redis cache**/
                 console.log("checking for update");
-                commonMethod.scrapePackage(url, userLang).then(function(data) {
+                commonMethod.scrapePackage(url, userLang,packageName).then(function(data) {
                     var packInfo = JSON.parse(hmData[packageName]);
                     if(data.category === packInfo.category) {
                         resolve(hmData[packageName]);
@@ -101,6 +101,7 @@ function updatePackage(packageName) {
                         });
                     }
                 }).catch(function(err){
+                  reject(err);
                   console.log(err);
                 })
             }

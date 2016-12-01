@@ -24,15 +24,19 @@ var category = mongoose.Schema({
         type: String,
         required: true
     },
+    categoryId: {
+        type: Number,
+        required: true
+    },
     category: {
         type: String,
         required: true
     },
-    locale: {
+    GPcategory: {
         type: String,
         required: true
     },
-    GPcategory: {
+    locale: {
         type: String,
         required: true
     },
