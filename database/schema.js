@@ -39,7 +39,7 @@ var category = mongoose.Schema({
     packageStatus:{
         type:String,
         required:true,
-        default: "packages_added"
+        default: "package_added"
     },
     timestamp: {
         type: Date,
