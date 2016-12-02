@@ -82,12 +82,11 @@ commonMethod.retrieveMongoData = function(timestamp){
 
         var call2 = findData(timestamp,"package_modified").then(function(data){
           tempObj[data.packageStatus]=data.data;
+        })
+        Promise.all([call1,call2]).then(function(){
           resolve(tempObj);
         }).catch(function(error){
           reject(error);
-        })
-        Promise.all(findData).then(function(){
-          console.log("promise All:::",tempObj);
         })
       });
 
