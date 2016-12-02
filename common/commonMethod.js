@@ -49,6 +49,7 @@ commonMethod.saveInMongo = function(objData) {
 
 };
 
+/****** Method is use to update package and make packageStatus modified  *****/
 commonMethod.updateMongo = function(objData, p_id) {
     return new Promise(function(resolve, reject) {
         conn.category.update({
