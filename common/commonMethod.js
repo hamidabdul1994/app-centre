@@ -72,7 +72,7 @@ commonMethod.updateMongo = function(objData, p_id) {
     });
 };
 
-/****** Method is sync the data from last timestamp updated (client timestamp) to latest one *******/
+/****** Method is sync the data from last timestamp updated (client timestamp) sto latest one *******/
 commonMethod.retrieveMongoData = function(timestamp){
   return new Promise(function(resolve, reject) {
         var tempObj ={};
