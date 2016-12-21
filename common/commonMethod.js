@@ -3,25 +3,19 @@ var fs = require('fs');
 var HashTable1 = require("./hashtable");
 var request = require("request");
 var cheerio = require("cheerio");
+var crypto = require('crypto');
 var commonMethod = {};
 
+
 /****** Method to generate Hash Code for storing the Package_id in hashSet ******/
-commonMethod.generateHashCode = function(url) {
-    var hash = 5387;
-    var char;
-    for (i = 0; i < url.length; i++) {
-        char = url.charCodeAt(i);
-        hash = ((hash << 5) + hash) + char; /* (hash will left shift by 5 AND add with actual hash) + char  */
-    }
-    //Retriving last four digits
-    var hashkey = hash.toString();
-    var finalhkey = hashkey.substr(hashkey.length - 3, hashkey.length)
+commonMethod.generateHashCode = function(packageName) {
+    var hashkey = crypto.createHash('md5').update(packageName).digest("hex");
+    var finalhkey = hashkey.substr(hashkey.length - 3, hashkey.length);
     return finalhkey;
 };
 
 /******* Method to save Data in MongoDB using schema ************/
 commonMethod.saveInMongo = function(objData) {
-  console.log("mongo Data::",objData);
     var data = new conn.category({
         packageName: objData.packageName,
         locale: objData.locale,
@@ -36,7 +30,6 @@ commonMethod.saveInMongo = function(objData) {
          * @return {successfully uploaded}
          **/
         data.save(function(error, result) {
-          console.log("result::",result);
             result['catId'] = objData.catId;
             if (error) {
                 reject(error);
@@ -119,7 +112,6 @@ var findData = function(timeData,packageStatus){
 
 /******* Method is use to Scrape the package data and callback to caller   ******/
 commonMethod.scrapePackage = function(url, locale,packageName) {
-  console.log(packageName);
     return new Promise(function(resolve, reject) {
         request(url, function(error, response, html) {
             if (!error) {

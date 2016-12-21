@@ -6,12 +6,11 @@ Purpose:Model of IPL Application and give the different states
 ***/
 var express = require('express'),
     bodyParser = require('body-parser'),
-    // path = require('path'),
-    // request = require('request'),
+    logger = require("morgan"),
     cors = require('cors'),
     app = express(),
-    port = process.env.PORT || 3000;
-
+    port = process.env.PORT || 3001;
+app.use(logger("dev"));
 app.use(cors());
 app.use(bodyParser.urlencoded({
     extended: false
