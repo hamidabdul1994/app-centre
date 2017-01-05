@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var commonMethod = require("../common/commonMethod");
-var redisClient = require('redis').createClient(); //14344, 'redis-14344.c10.us-east-1-4.ec2.cloud.redislabs.com', {no_ready_check: true}
+var redisClient = require('redis').createClient(14344, 'redis-14344.c10.us-east-1-4.ec2.cloud.redislabs.com', {no_ready_check: true}); //
 /**POST (request)**/
 router.post('/', function(req, res) {
   try{
