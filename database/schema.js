@@ -4,8 +4,8 @@
 var mongoose = require('mongoose'),
     autoIncrement = require('mongoose-auto-increment');
 mongoose.Promise = global.Promise;
- // var url = "mongodb://root:123@ds111188.mlab.com:11188/appcentre";
-var url = 'mongodb://localhost:27017/appCentre';
+ var url = "mongodb://root:123@ds111188.mlab.com:11188/appcentre";
+// var url = 'mongodb://localhost:27017/appCentre';
 var connection = mongoose.connect(url);
 autoIncrement.initialize(connection);
 
