@@ -49,7 +49,7 @@ function updatePackage(packageName) {
         /****** Check HashMap Package Data is available or not******/
         redisClient.hgetall(hashKey, function(error, hmData) {
             /* WHen HashMap Having some value**/
-            if (hmData[redisKey] !== undefined)
+            if (hmData !== null && hmData[redisKey] !== undefined)
                 var hmPackData = JSON.parse(hmData[redisKey]);
 
             /*** When HashMap has nothing**/
